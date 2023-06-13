@@ -2,9 +2,7 @@ FROM node:14
 
 WORKDIR /app
 
-copy . .
-
-RUN npm install
+COPY . .
 
 ENV NODE_ENV=production DB_HOST=item-db
 
