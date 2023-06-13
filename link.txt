@@ -1,0 +1,2 @@
+Link to docker image for this repository:
+https://github.com/users/maxzx3000/packages/container/package/item-app
