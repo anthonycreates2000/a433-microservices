@@ -1,20 +1,37 @@
+# Version used for docker compose.
 version: "3.9"
 
+# There are 2 services used for making docker containers.
+# Item-app: An app called "Daftar Item".
+# app-db: A database for this app.
 services:
   item-app:
+    # Get docker image from this link, which is made from the current dockerfile
+    # we just worked on.
     image: ghcr.io/maxzx3000/item-app:v1
+    # Wait item-db to finish initializing before starting item-app service.
     depends_on:
       - item-db
+    # Expose port 80 on localhost and 8080 on docker container.
     ports:
       - 80:8080
+    # Set working directory for this app to previously initialized app directory
+    # on dockerfile.
     working_dir: /app
+    # By setting restart policy to on-failure, this service restarts
+    # when there's an error.
     restart: on-failure
 
   item-db:
+    # Get mongo image version 3.
     image: mongo:3
+    # Map the volume of app-db to /data/db to store data in the database.
     volumes:
       - app-db:/data/db
+    # By setting restart policy to on-failure, this service restarts
+    # When there's an error.
     restart: on-failure
 
+# Create a volume called app-db.
 volumes:
   app-db:
