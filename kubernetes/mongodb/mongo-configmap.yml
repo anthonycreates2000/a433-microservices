@@ -1,0 +1,20 @@
+# Set this ConfigMap's version to v1.
+apiVersion: v1
+# Set this file type to ConfigMap.
+kind: ConfigMap
+metadata:
+  # Set the name of this configmap file.
+  name: mongo-config
+data:
+  # This is a mechanism where we allow TCP Connedction to remain active,
+  # even though there's no data is exchanged for a long period of time.
+  # Note that the data stored in ConfigMap can't exceed 1 MB, so we need to limit the max capacity size! 
+  config: |
+    tcp-keepalive 240
+    maxmemory 1mb
+  # Set the location of where we can store the database file.
+  mongo.conf: |
+    storage:
+      dbPath: /data/db
+  # Set host path of mongo, e.g. http://mongo...
+  mongo-url: mongo

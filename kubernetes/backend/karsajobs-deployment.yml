@@ -1,0 +1,51 @@
+# Initiate API Version for Deployment.
+apiVersion: apps/v1
+# Set this service as deployment.
+kind: Deployment
+metadata:
+  # Set this deployment's as app-tier.
+  name: app-tier
+  # Added labels for app and tier, so it can be visible to service.
+  labels:
+    app: karsajobs
+    tier: app
+spec:
+  # Set number of pods to 1.
+  replicas: 1
+  # Set the selector as tier as core grouping primitive in Kubernetes,
+  # similar to labels -> app. So, it can be accessed from outer kubernetes cluster as well.
+  selector:
+    matchLabels:
+      tier: app
+  template:
+    metadata:
+      # Again, we make sure that this component can interact
+      # with other components (e.g. services, etc.).
+      labels:
+        tier: app
+    spec:
+      containers:
+        # Initalize container by downloading image from this image: ghcr.io/maxzx3000/anthony_max/karsajobs:latest.
+      - name: nodejs
+        image: ghcr.io/maxzx3000/anthony_max/karsajobs:latest
+        imagePullPolicy: IfNotPresent # If the image is not present in the system, then download it. Otherwise, let's just use the previously downloaded image.
+        ports:
+          # Set this container port to 8080.
+          - containerPort: 8080
+        env:
+            # Set app port to 8080, where this backend server is located.
+          - name: APP_PORT
+            value: "8080"
+            # Set mongo host URL to "mongo", i.e. http://mongo...
+          - name: MONGO_HOST
+            value: "mongo"
+          - name: MONGO_USER
+            valueFrom:
+              secretKeyRef:
+                name: data-tier-secret
+                key: MONGO_ROOT_USERNAME
+          - name: MONGO_PASS
+            valueFrom:
+              secretKeyRef:
+                name: data-tier-secret
+                key: MONGO_ROOT_PASSWORD

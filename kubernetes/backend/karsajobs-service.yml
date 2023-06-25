@@ -1,0 +1,23 @@
+# Set this Service version to v1.
+apiVersion: v1
+# Set the type of the component to service.
+kind: Service
+metadata:
+  name: app-tier
+  # Set the app to karsajobs (global app configuration).
+  labels:
+    app: karsajobs
+spec:
+  # Set service type as nodeport,
+  # So it can be accessed from outer kubernetes cluster as well.
+  # E.g. through browser.
+  type: NodePort
+  ports:
+      # Port: container port exposed by a pod/ deployment.
+    - port: 8080
+       # Target Port: port on host machine.
+      targetPort: 8080
+      # Node Port: exposes a service externally to cluster by target nodes' IP Address and NodePort.
+      nodePort: 31000
+  selector:
+    tier: app

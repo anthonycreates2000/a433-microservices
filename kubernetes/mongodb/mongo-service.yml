@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo
+  labels:
+    app: karsajobs
+spec:
+  selector:
+    tier: backend
+  ports:
+    - name: mongo
+      port: 27017
+      protocol: TCP
+  clusterIP: None
+  
+  

@@ -1,0 +1,40 @@
+# Set this Deployment version to v1.
+apiVersion: apps/v1
+# Set the type of the component to deployment.
+kind: Deployment
+metadata:
+  # Set the name of the deployment.
+  name: support-tier
+  # Set the app to karsajobs (global app configuration).
+  # And, also set the tier to support, since this is a support-tier configuration.
+  labels:
+    app: karsajobs
+    tier: support
+spec:
+  selector:
+    # Note that we need make sure that tier must be equal to deployment's metadata.
+    # And other services in support tier as well, so it can communicate
+    # within different kubernetes components.
+    matchLabels:
+      tier: support
+  template:
+    metadata:
+      # Again, we make sure that this component can interact
+      # with other components (e.g. services, etc.).
+      labels:
+        app: karsajobs
+        tier: support
+    spec:
+      containers:
+        # We specify the name of the container to container-ui.
+      - name: container-ui
+        # Download karsajobs-ui image from github package.
+        image: ghcr.io/maxzx3000/anthony_max/karsajobs-ui:latest
+        # Match the container's port to 8000, just as we defined in the image.
+        ports:
+          - containerPort: 8000
+        # Instead of setting env in the ui directory,
+        # We specify the Vue app backend location path in this environment variable.
+        env:
+          - name: VUE_APP_BACKEND
+            value: http://localhost:31000

@@ -1,0 +1,74 @@
+# Initiate API Version.
+apiVersion: apps/v1
+# Initiate this service as StatefulSet. If we'd like to store data, it's better to use.
+kind: StatefulSet
+metadata:
+  # Set stateful name and app as mongo, and within karsajobs app.
+  name: mongo
+  labels:
+    app: karsajobs
+spec:
+  # Set serviceName as mongo, so the name of the service can be defined manually
+  # (instead of mongo-0, mongo-1, etc.).
+  serviceName: mongo
+  # Set selector so this stateful set can be used with other components in kubernetes as well.
+  selector:
+    matchLabels:
+      app: karsajobs
+      tier: backend
+  # Set the number of pods to 1.
+  replicas: 1
+  template:
+    metadata:
+      # Again, we make sure that this component can interact
+      # with other components (e.g. services, etc.).
+      labels:
+        app: karsajobs
+        tier: backend
+    spec:
+    # Use mongo image to initialize the containers.
+    # Mongodb is a No-SQL Database.
+      containers:
+      - image: mongo:latest
+        name: "mongo"
+        ports:
+            # Set containerPort to 27017, which is mongodb's default port.
+          - containerPort: 27017
+            name: mongo
+        # Set MONGO_DB's environment variables.
+        # We initialize username and password based on the specified directory.
+        env:
+        - name: MONGO_INITDB_ROOT_USERNAME_FILE
+          value: /etc/mongo-credentials/MONGO_ROOT_USERNAME
+        - name: MONGO_INITDB_ROOT_PASSWORD_FILE
+          value: /etc/mongo-credentials/MONGO_ROOT_PASSWORD
+        # Mount persistent-storage, config-map and credentials.
+        volumeMounts:
+          # Specify where the location of the data should be saved.
+        - name: mongo-persistent-storage
+          mountPath: /data/db
+          # Specify the configuration location to be stored.
+        - name: mongo-config-map
+          mountPath: /config
+          # Specify the credential location to be stored.
+        - name: mongo-credentials
+          mountPath: /etc/mongo-credentials
+      # Set the volumes for each of the storage.
+      volumes:
+      # Note that we need to use persistentVolumeClaim to .
+      - name: mongo-persistent-storage
+        persistentVolumeClaim:
+          claimName: mongo-pv-claim
+      # Set Configuration map, where we can define key/value for mongo-config.
+      - name: mongo-config-map
+        configMap:
+          name: mongo-config
+          items:
+            - key: mongo.conf
+              path: mongo.conf
+      # Set the values of mongo-credentials, where
+      # We can set up the values for the secrets from data-tier-secret
+      # we defined from mongo-secret.yml.
+      - name: mongo-credentials
+        secret:
+          secretName: data-tier-secret
