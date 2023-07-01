@@ -1,0 +1,54 @@
+# Set this Deployment version to customer/v1.
+apiVersion: apps/v1
+# Set the type of the component to deployment.
+kind: StatefulSet
+metadata:
+  # Set the name of the deployment.
+  name: shipping
+  # Set the app to karsajobs (global app configuration).
+  # And, also set the tier to support, since this is a support-tier configuration.
+  labels:
+    app: rabbit-app
+    tier: consumer
+spec:
+  selector:
+    # Note that we need make sure that tier must be equal to deployment's metadata.
+    # And other services in support tier as well, so it can communicate
+    # within different kubernetes components.
+    matchLabels:
+      tier: consumer
+  template:
+    metadata:
+      # Again, we make sure that this component can interact
+      # with other components (e.g. services, etc.).
+      labels:
+        app: rabbit-app
+        tier: consumer
+    spec:
+      containers:
+        # We specify the name of the container to container-ui.
+      - name: "consumer-container"
+        # Download karsajobs-ui image from github package.
+        image: ghcr.io/anthonycreates2000/shipping_build-service:v1
+        # Match the container's port to 3001, just as we defined in the Dockerfile.
+        ports:
+          - name: consumer
+            containerPort: 3001
+        volumeMounts:
+            # Specify where the location of the data should be saved.
+          - name: shipping-persistent-storage
+            mountPath: /src
+        # Instead of setting env in the ui directory,
+        # We specify the Vue app backend location path in this environment variable.
+        env:
+          - name: NODE_ENV
+            value: production
+          - name: AMQP_URL
+            value: "amqp://guest:guest@10.106.121.125:5672"
+          - name: PORT
+            value: "3001"
+      volumes:
+        # Note that we need to use persistentVolumeClaim to .
+        - name: shipping-persistent-storage
+          persistentVolumeClaim:
+            claimName: shipping-pv-claim

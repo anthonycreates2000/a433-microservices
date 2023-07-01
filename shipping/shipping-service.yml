@@ -1,0 +1,33 @@
+# Set this Service version to v1.
+apiVersion: v1
+# Set the type of the component to service.
+kind: Service
+metadata:
+  # Set the name of the service.
+  name: customer-tier
+   # Set the app to rabbit-app (global app configuration).
+  # And, also set the tier to support, since this is a support-tier configuration.
+  labels:
+    app: rabbit-app
+spec:
+  # Set service type as nodeport.
+  # So it can be accessed from outer kubernetes cluster as well.
+  # E.g. through browser.
+  type: NodePort
+  ports:
+      # Set the name of the port
+    - name: customer-container
+      # Set protocol to determine how data is transmitted between different devices (containers/ services/ storage) in the same network.
+      # TCP is suitable to exchange messages through the network.
+      protocol: TCP
+      # Port: container port exposed by a pod/ deployment.
+      port: 3001
+      # Target Port: port on host machine.
+      targetPort: 3001
+      # Node Port: exposes a service externally to cluster by target nodes' IP Address and NodePort.
+      nodePort: 31000
+  # Set the selector as tier as core grouping primitive in Kubernetes,
+  # similar to labels -> app. So, it can be accessed from outer kubernetes cluster as well.
+  selector:
+    tier: customer
+  

@@ -1,0 +1,41 @@
+apiVersion: v1
+# We set up persistent volume, so our data is not lost
+# when changing pods.
+kind: PersistentVolume
+metadata:
+  name: consumer-pv-volume
+  # This label represents that a volume is a local disk that's directly.
+  # attached to a single kubernetes node.
+  labels:
+    type: local
+spec:
+  # We make the disk and PV manually.
+  storageClassName: manual
+  # Set the capacity of the storage given.
+  capacity:
+    storage: 20Gi
+  # We allow read and write to the database by a single node.
+  accessModes:
+    - ReadWriteOnce
+  # Specify where to mount a file/ directory from host node's filesystem
+  # into a pod.
+  hostPath:
+    path: "/"
+---
+# Set the API Version of Persistent Volume Claim to 1.
+apiVersion: v1
+# Before we can use persistent volume, we need to claim it first.
+# So, we define PersistentVolumeClaim.
+kind: PersistentVolumeClaim
+metadata:
+  # Set the name of the pv claim.
+  name: shipping-pv-claim
+spec:
+  # We make the disk and PV manually.
+  storageClassName: manual
+  # We allow read and write to the database by a single node.
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi

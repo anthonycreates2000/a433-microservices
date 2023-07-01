@@ -1,0 +1,55 @@
+# Initiate API Version.
+apiVersion: apps/v1
+# Initiate this service as StatefulSet. If we'd like to store data, it's better to use.
+kind: StatefulSet
+metadata:
+  # Set stateful name and app as mongo, and within karsajobs app.
+  name: order
+  labels:
+    app: rabbit-app
+spec:
+  # Set serviceName as mongo, so the name of the service can be defined manually
+  # (instead of mongo-0, mongo-1, etc.).
+  serviceName: order
+  # Set selector so this stateful set can be used with other components in kubernetes as well.
+  selector:
+    matchLabels:
+      app: rabbit-app
+      tier: producer
+  # Set the number of pods to 1.
+  replicas: 1
+  template:
+    metadata:
+      # Again, we make sure that this component can interact
+      # with other components (e.g. services, etc.).
+      labels:
+        app: rabbit-app
+        tier: producer
+    spec:
+    # Use mongo image to initialize the containers.
+    # Mongodb is a No-SQL Database.
+      containers:
+      - image: ghcr.io/anthonycreates2000/order_build-service:v1
+        name: "producer-container"
+        ports:
+            # Set containerPort to 27017, which is mongodb's default port.
+          - containerPort: 3000
+            name: producer
+        # Mount persistent-storage, config-map and credentials.
+        volumeMounts:
+            # Specify where the location of the data should be saved.
+          - name: order-persistent-storage
+            mountPath: /src
+        # Set the volumes for each of the storage.
+        env:
+          - name: NODE_ENV
+            value: production
+          - name: AMQP_URL
+            value: "amqp://guest:guest@10.106.121.125:5672"
+          - name: PORT
+            value: "3000"
+      volumes:
+        # Note that we need to use persistentVolumeClaim to .
+        - name: order-persistent-storage
+          persistentVolumeClaim:
+            claimName: order-pv-claim
