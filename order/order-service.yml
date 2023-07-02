@@ -1,6 +1,8 @@
 # Set this Service version to v1.
 apiVersion: v1
 # Set the type of the component to service.
+# Service is an abstraction that encapsulates pods. 
+# These pods have the same function and runs in the cluster.
 kind: Service
 metadata:
   # Set the name of the service.
@@ -10,7 +12,7 @@ metadata:
   labels:
     app: rabbit-app
 spec:
-  # Set service type as nodeport,
+  # Set service type as nodeport
   # So it can be accessed from outer kubernetes cluster as well.
   # E.g. through browser.
   type: NodePort

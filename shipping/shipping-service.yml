@@ -1,11 +1,13 @@
 # Set this Service version to v1.
 apiVersion: v1
 # Set the type of the component to service.
+# Service is an abstraction that encapsulates pods. 
+# These pods have the same function and runs in the cluster.
 kind: Service
 metadata:
   # Set the name of the service.
   name: customer-tier
-   # Set the app to rabbit-app (global app configuration).
+  # Set the app to rabbit-app (global app configuration).
   # And, also set the tier to support, since this is a support-tier configuration.
   labels:
     app: rabbit-app

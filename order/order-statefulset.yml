@@ -9,7 +9,7 @@ metadata:
     app: rabbit-app
 spec:
   # Set serviceName as mongo, so the name of the service can be defined manually
-  # (instead of mongo-0, mongo-1, etc.).
+  # (instead of order-0, order-1, etc.).
   serviceName: order
   # Set selector so this stateful set can be used with other components in kubernetes as well.
   selector:
@@ -26,13 +26,12 @@ spec:
         app: rabbit-app
         tier: producer
     spec:
-    # Use mongo image to initialize the containers.
-    # Mongodb is a No-SQL Database.
+      # Use order_build-service image from github package to initialize the containers.
       containers:
       - image: ghcr.io/anthonycreates2000/order_build-service:v1
         name: "producer-container"
         ports:
-            # Set containerPort to 27017, which is mongodb's default port.
+            # Set containerPort to 3000, which is mongodb's default port.
           - containerPort: 3000
             name: producer
         # Mount persistent-storage, config-map and credentials.
@@ -41,15 +40,18 @@ spec:
           - name: order-persistent-storage
             mountPath: /src
         # Set the volumes for each of the storage.
+        # - NODE_ENV: Set nodejs behavior, to behave as development/ production.
+        # - AMQP_URL: Set AMQP_URL for receiving queues. URL structure: amqp://user:password@clusterIP:rabbitmq_kubernetes_queuing_port
+        # - PORT: Set shipping's container port.
         env:
           - name: NODE_ENV
             value: production
           - name: AMQP_URL
-            value: "amqp://guest:guest@10.106.121.125:5672"
+            value: "amqp://guest:guest@10.105.235.154:5672"
           - name: PORT
             value: "3000"
       volumes:
-        # Note that we need to use persistentVolumeClaim to .
+        # Note that we need to use persistentVolumeClaim, since this is a stateful component.
         - name: order-persistent-storage
           persistentVolumeClaim:
             claimName: order-pv-claim

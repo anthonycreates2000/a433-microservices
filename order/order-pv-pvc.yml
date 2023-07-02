@@ -33,9 +33,10 @@ metadata:
 spec:
   # We make the disk and PV manually.
   storageClassName: manual
-  # We allow read and write to the database by a single node.
+  # This allows read and write to the database by a single node.
   accessModes:
     - ReadWriteOnce
+  # Max storage for this volume is 20 GB.
   resources:
     requests:
       storage: 20Gi

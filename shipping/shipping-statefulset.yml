@@ -26,9 +26,9 @@ spec:
         tier: consumer
     spec:
       containers:
-        # We specify the name of the container to container-ui.
+        # We specify the name of the container.
       - name: "consumer-container"
-        # Download karsajobs-ui image from github package.
+        # Use shipping_build-service image from github package to initialize the containers.
         image: ghcr.io/anthonycreates2000/shipping_build-service:v1
         # Match the container's port to 3001, just as we defined in the Dockerfile.
         ports:
@@ -40,15 +40,18 @@ spec:
             mountPath: /src
         # Instead of setting env in the ui directory,
         # We specify the Vue app backend location path in this environment variable.
+        # - NODE_ENV: Set nodejs behavior, to behave as development/ production.
+        # - AMQP_URL: Set AMQP_URL for receiving queues. URL structure: amqp://user:password@clusterIP:rabbitmq_kubernetes_queuing_port
+        # - PORT: Set shipping's container port.
         env:
           - name: NODE_ENV
             value: production
           - name: AMQP_URL
-            value: "amqp://guest:guest@10.106.121.125:5672"
+            value: "amqp://guest:guest@10.105.235.154:5672"
           - name: PORT
             value: "3001"
       volumes:
-        # Note that we need to use persistentVolumeClaim to .
+        # Note that we need to use persistentVolumeClaim, since this is a stateful component.
         - name: shipping-persistent-storage
           persistentVolumeClaim:
             claimName: shipping-pv-claim
