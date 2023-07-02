@@ -1,4 +1,5 @@
 # Build a docker image from dockerfile in this directory.
+# Note that we only targetting dev build, since this is used for messaging service in RabbitMQ.
 docker build --target dev -t shipping_build-service:v1 .
 
 # List all images that are installed in docker.
