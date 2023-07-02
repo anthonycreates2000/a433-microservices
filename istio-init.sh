@@ -1,4 +1,5 @@
 # Add environment variable path so we can access istioctl command.
+# Make sure that your directory path is in istio folder.
 export PATH=$PWD/bin:$PATH
 
 # Install Istioctl with demo profile for basic functionality.
