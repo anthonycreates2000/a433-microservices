@@ -1,0 +1,5 @@
+Github image link for order_build-service:
+https://github.com/users/anthonycreates2000/packages/container/package/order_build-service
+
+Github image link for shipping_build-service:
+https://github.com/users/anthonycreates2000/packages/container/package/shipping_build-service
