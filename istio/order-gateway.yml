@@ -1,33 +1,53 @@
+# This apiVersion follows istio convention.
+# We define v1alpha3 as a version.
 apiVersion: networking.istio.io/v1alpha3
+# Set the type of the component as gateway.
+# Gateway describes a load balancer operating at the edge of the mesh receiving incoming or
+# outgoing HTTP/TCP connections.
 kind: Gateway
 metadata:
+  # Set the name of the gateway as order.
   name: order-gateway
 spec:
   selector:
-    istio: ingressgateway # use istio default controller
+    # Use istio default controller
+    istio: ingressgateway 
   servers:
   - port:
+      # Access load balancer at port 80 with HTTP protocol.
       number: 80
       name: http
       protocol: HTTP
     hosts:
     - "*"
 ---
+# This apiVersion follows istio convention.
+# We define v1alpha3 as a version.
 apiVersion: networking.istio.io/v1alpha3
+# Set the kind of the component that is defined as a set of traffic routing rules
+# to apply when a host is addressed.
+# If a match traffic is found, it's sent to a named destination service defined in the registry.
 kind: VirtualService
 metadata:
+  # Set virtual service name for rabbit-app.
+  # This is done so I know that this routing rules belong to rabbit-app application.
   name: rabbit-app
 spec:
+  # All hosts can be accessed to this virtual service.
   hosts:
   - "*"
+  # Set order-gateway as the gateway to access this virtual service.
   gateways:
   - order-gateway
   http:
   - match:
+    # If host:port matches with /order as a path.
     - uri:
         exact: /order
     route:
     - destination:
+        # Access producer-tier's service with port number 3000.
+        # This is where order service is in.
         host: producer-tier
         port:
           number: 3000
