@@ -1,5 +1,5 @@
 # ==================================
-# IMPORTANT NOTE: Make sure to run minikube tunnel first from .
+# IMPORTANT NOTE: Make sure to run minikube tunnel first, before running this shell code.
 # ==================================
 # Get all inggress IP address parts to access istio external IP address.
 export INGRESS_HOST=$(kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
